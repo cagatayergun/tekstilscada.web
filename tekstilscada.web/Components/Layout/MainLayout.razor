@@ -1,6 +1,20 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
 
-@Body
+<AuthorizeView>
+    <Authorized>
+        @Body
+    </Authorized>
+    <NotAuthorized>
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+            <div class="card p-4 shadow-sm" style="width: 400px;">
+                <h4 class="card-title text-center">Giriş Yapmalısınız</h4>
+                <p class="text-center">Bu sayfayı görebilmek için lütfen giriş yapın.</p>
+                <a href="/login" class="btn btn-primary">Giriş Sayfasına Git</a>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.

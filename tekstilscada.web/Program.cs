@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using tekstilscada.web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,7 +6,16 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+// ASP.NET Core Identity hizmetlerini ekle
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+})
+    .AddIdentityCookies();
 
+builder.Services.AddAuthorization();
+builder.Services.AddCascadingAuthenticationState();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -20,7 +30,9 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
-
+// Kimlik doðrulama ve yetkilendirme middleware'ini ekle
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

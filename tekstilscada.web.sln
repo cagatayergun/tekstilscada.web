@@ -5,6 +5,10 @@ VisualStudioVersion = 17.14.36310.24 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tekstilscada.web", "tekstilscada.web\tekstilscada.web.csproj", "{5C43B8C2-3EF2-40E3-9CFB-F7E5B9A19659}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TekstilScada.Core", "..\modbus-tcpip\TekstilScada.Core\TekstilScada.Core.csproj", "{04A6494C-5B91-1E0C-FE28-AACD3E0D6352}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TekstilScada.Api", "..\modbus-tcpip\TekstilScada.Api\TekstilScada.Api.csproj", "{97864529-F1CE-5671-733B-6B58D810737A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{5C43B8C2-3EF2-40E3-9CFB-F7E5B9A19659}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C43B8C2-3EF2-40E3-9CFB-F7E5B9A19659}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C43B8C2-3EF2-40E3-9CFB-F7E5B9A19659}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04A6494C-5B91-1E0C-FE28-AACD3E0D6352}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04A6494C-5B91-1E0C-FE28-AACD3E0D6352}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04A6494C-5B91-1E0C-FE28-AACD3E0D6352}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04A6494C-5B91-1E0C-FE28-AACD3E0D6352}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97864529-F1CE-5671-733B-6B58D810737A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97864529-F1CE-5671-733B-6B58D810737A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97864529-F1CE-5671-733B-6B58D810737A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97864529-F1CE-5671-733B-6B58D810737A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

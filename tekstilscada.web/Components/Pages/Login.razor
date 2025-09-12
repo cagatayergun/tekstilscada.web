@@ -1,0 +1,40 @@
+﻿@page "/login"
+<h3>Giriş Yap</h3>
+
+<form @onsubmit="HandleLogin">
+    <div class="form-group">
+        <label for="email">E-posta:</label>
+        <input type="email" class="form-control" id="email" @bind="Email" required />
+    </div>
+    <div class="form-group mt-3">
+        <label for="password">Parola:</label>
+        <input type="password" class="form-control" id="password" @bind="Password" required />
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Giriş Yap</button>
+
+    @if (!string.IsNullOrEmpty(Error))
+    {
+        <div class="alert alert-danger mt-3">@Error</div>
+    }
+</form>
+
+@code {
+    private string Email { get; set; } = string.Empty;
+    private string Password { get; set; } = string.Empty;
+    private string Error { get; set; } = string.Empty;
+
+    private async Task HandleLogin()
+    {
+        // Burada gerçek kullanıcı doğrulama (örneğin bir API'ye istek gönderme) işlemleri yapılacak.
+        // Şimdilik basit bir kontrol yapalım.
+        if (Email == "test@tekstilscada.com" && Password == "12345")
+        {
+            // Başarılı girişten sonra anasayfaya yönlendirme
+            NavigationManager.NavigateTo("/", forceLoad: true);
+        }
+        else
+        {
+            Error = "Geçersiz e-posta veya parola.";
+        }
+    }
+}
