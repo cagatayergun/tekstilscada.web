@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using TekstilScada.Core.Services;
 using TekstilScada.Repositories;
 using TekstilScada.Services;
-using TekstilScada.Web.Models;
+
 
 namespace TekstilScada.Api.Controllers
 {
@@ -26,26 +26,6 @@ namespace TekstilScada.Api.Controllers
             _pollingService = pollingService;
         }
 
-        [HttpGet("GetKpiData")]
-        public async Task<ActionResult<KpiViewModel>> GetKpiData()
-        {
-            // Verileri PlcPollingService'in bellek içi önbelleğinden çekiyoruz.
-            var allStatuses = _pollingService.MachineDataCache.Values;
-
-            int totalMachines = allStatuses.Count;
-            int runningMachines = allStatuses.Count(s => s.IsInRecipeMode && !s.IsPaused && !s.HasActiveAlarm);
-            int alarmedMachines = allStatuses.Count(s => s.HasActiveAlarm);
-            int stoppedMachines = totalMachines - runningMachines - alarmedMachines;
-
-            var kpiData = new KpiViewModel
-            {
-                TotalMachineCount = totalMachines,
-                RunningMachineCount = runningMachines,
-                StoppedMachineCount = stoppedMachines,
-                AlarmedMachineCount = alarmedMachines
-            };
-
-            return Ok(kpiData);
-        }
+       
     }
 }

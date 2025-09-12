@@ -17,7 +17,7 @@ try
     builder.WebHost.ConfigureKestrel(serverOptions =>
     {
         // Port numarasýnýn launchSettings.json ile ayný olduðundan emin ol
-        int httpsPort = 7253;
+        int httpsPort = 7235;
 
         serverOptions.ListenLocalhost(httpsPort, listenOptions =>
         {
