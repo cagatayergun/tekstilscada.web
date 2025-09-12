@@ -16,7 +16,7 @@ builder.Services.AddHttpClient("WebApiClient", client =>
 {
     // LÜTFEN WebAPI projenizin çalýþtýðý PORT numarasýný burada kontrol edin!
     // Genellikle 7000'li bir sayýdýr.
-    client.BaseAddress = new Uri("https://localhost:7235");
+    client.BaseAddress = new Uri("https://localhost:7039");
 })
 .ConfigurePrimaryHttpMessageHandler(() =>
 {

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace TekstilScada.Api.Controllers
+namespace TekstilScada.WebAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
