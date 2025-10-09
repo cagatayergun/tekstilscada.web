@@ -6,7 +6,12 @@ using TekstilScada.WebAPI.Hubs;
 using TekstilScada.WebAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+// 1. Configuration'dan (appsettings.json) veritabaný baðlantý dizesini oku.
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+// 2. Okunan baðlantý dizesini Core katmanýndaki statik AppConfig sýnýfýna ata.
+// Bu sayede projedeki tüm Repository sýnýflarý doðru baðlantý dizesini kullanabilir.
+TekstilScada.Core.AppConfig.SetConnectionString(connectionString);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

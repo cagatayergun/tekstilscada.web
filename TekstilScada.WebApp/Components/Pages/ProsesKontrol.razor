@@ -45,7 +45,6 @@
         }
         else if (selectedRecipe == null)
         {
-
             <p>Detayları görmek için bir reçete seçin veya yeni bir reçete oluşturun.</p>
         }
         else
@@ -67,7 +66,8 @@
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Hedef Makine:</label>
-                    <select class="form-select" @bind="selectedMachineId">
+                    @* --- DEĞİŞİKLİK BURADA --- *@
+                    <select class="form-select" @bind="SelectedMachineId">
                         @if (machines != null)
                         {
                             foreach (var machine in machines)
@@ -104,7 +104,6 @@
                         }
                         else
                         {
-
                             <StepEditor Step="selectedStep" OnChanged="RefreshStepList" />
                         }
                     </div>
@@ -124,9 +123,18 @@
     private string statusMessage = string.Empty;
     private bool showFtpModal = false;
 
-    private Machine? selectedMachine => machines?.FirstOrDefault(m => m.Id == selectedMachineId);
-    
+    // --- DEĞİŞİKLİK BURADA ---
+    private Machine? selectedMachine;
 
+    private int SelectedMachineId
+    {
+        get => selectedMachineId;
+        set
+        {
+            selectedMachineId = value;
+            selectedMachine = machines?.FirstOrDefault(m => m.Id == value);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -136,7 +144,8 @@
         machines = await ScadaDataService.GetMachinesAsync();
         if (machines != null && machines.Any())
         {
-            selectedMachineId = machines.First().Id;
+            // SelectedMachineId'yi ayarladığımızda, selectedMachine de otomatik güncellenecek.
+            SelectedMachineId = machines.First().Id;
         }
         isBusy = false;
     }
@@ -156,10 +165,8 @@
 
     private void RefreshStepList() => StateHasChanged();
 
-    // Diğer metotlar (SelectRecipe, Save, Delete, SendToPlc, ReadFromPlc, GetStepTypeName) aynı kalabilir.
-    // Önceki yanıttaki tam hallerini buraya kopyalıyorum.
-
     private async Task LoadRecipes() { recipes = await ScadaDataService.GetRecipesAsync(); }
+
     private async Task SelectRecipe(int recipeId)
     {
         isBusy = true;
@@ -168,10 +175,12 @@
         selectedRecipe = await ScadaDataService.GetRecipeDetailsAsync(recipeId);
         isBusy = false;
     }
+
     private async Task SaveCurrentRecipe() { /* ... önceki yanıttaki kod ... */ }
     private async Task DeleteSelectedRecipe() { /* ... önceki yanıttaki kod ... */ }
     private async Task SendToPlc() { /* ... önceki yanıttaki kod ... */ }
     private async Task ReadFromPlc() { /* ... önceki yanıttaki kod ... */ }
+
     private string GetStepTypeName(ScadaRecipeStep step)
     {
         var stepTypes = new List<string>();
@@ -184,5 +193,4 @@
         if ((controlWord & 32) != 0) stepTypes.Add("Sıkma");
         return stepTypes.Any() ? string.Join(" + ", stepTypes) : "";
     }
-}
 }

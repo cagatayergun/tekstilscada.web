@@ -112,7 +112,22 @@ namespace TekstilScada.WebApp.Services
         public async Task<List<ProductionReportItem>?> GetProductionReportAsync(ReportFilters filters)
         {
             var response = await _httpClient.PostAsJsonAsync("api/reports/production", filters);
-            return response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<List<ProductionReportItem>>() : new List<ProductionReportItem>();
+
+            // --- HATA DETAYINI YAKALAMAK İÇİN BU BLOK EKLENDİ ---
+            if (!response.IsSuccessStatusCode)
+            {
+                // Eğer istek başarılı değilse (400 hatası gibi), sunucunun gönderdiği
+                // detaylı hata mesajını oku ve konsola yaz.
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"API Hatası: {response.StatusCode}");
+                Console.WriteLine($"Hata Detayı: {errorContent}");
+
+                // Hata durumunda boş bir liste döndürerek arayüzün çökmesini engelle.
+                return new List<ProductionReportItem>();
+            }
+            // --- BLOK SONU ---
+
+            return await response.Content.ReadFromJsonAsync<List<ProductionReportItem>>();
         }
 
         // === EKSİK OLAN METOT BURADA ===
