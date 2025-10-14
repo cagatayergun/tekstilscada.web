@@ -5,7 +5,12 @@ using System.Collections.Concurrent;
 using System.Net.Http.Json;
 using TekstilScada.Models;
 using TekstilScada.Repositories;
-
+public class GeneralDetailedConsumptionFilters
+{
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public List<int>? MachineIds { get; set; }
+}
 namespace TekstilScada.WebApp.Services
 {
     public class ScadaDataService
@@ -142,6 +147,120 @@ namespace TekstilScada.WebApp.Services
                 Console.WriteLine($"HMI reçeteleri alınamadı: {ex.Message}");
                 return new List<string> { $"Hata: {ex.Message}" };
             }
+        }
+        // YENİ METOT: Alarm Raporu Getirme
+        public async Task<List<AlarmReportItem>?> GetAlarmReportAsync(ReportFilters filters)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/reports/alarms", filters);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"API Hatası (Alarm Raporu): {response.StatusCode}");
+                Console.WriteLine($"Hata Detayı: {errorContent}");
+                return new List<AlarmReportItem>();
+            }
+
+            return await response.Content.ReadFromJsonAsync<List<AlarmReportItem>>();
+        }
+        // YENİ METOT: OEE Raporu Getirme
+        public async Task<List<OeeData>?> GetOeeReportAsync(ReportFilters filters)
+        {
+            // DÜZELTME: Metot adı değişikliğine uyum sağlamak için URL güncellendi
+            var response = await _httpClient.PostAsJsonAsync("api/dashboard/oee-report", filters);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"API Hatası (OEE Raporu): {response.StatusCode}");
+                Console.WriteLine($"Hata Detayı: {errorContent}");
+                return new List<OeeData>();
+            }
+
+            return await response.Content.ReadFromJsonAsync<List<OeeData>>();
+        }
+        public async Task<List<object>?> GetTrendDataAsync(ReportFilters filters)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/reports/trend", filters);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"API Hatası (Trend Raporu): {response.StatusCode}");
+                Console.WriteLine($"Hata Detayı: {errorContent}");
+                return null;
+            }
+
+            // API'den gelen veriyi List<object> (yani dinamik olarak) alıyoruz.
+            // Bu, client'ta doğru modele dönüştürülecektir.
+            return await response.Content.ReadFromJsonAsync<List<object>>();
+        }
+        public async Task<List<ProductionReportItem>?> GetRecipeConsumptionHistoryAsync(int recipeId)
+        {
+            try
+            {
+                return await _httpClient.GetFromJsonAsync<List<ProductionReportItem>>($"api/recipes/{recipeId}/usage-history");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Reçete kullanım geçmişi alınamadı: {ex.Message}");
+                return null;
+            }
+        }
+        // YENİ METOT: Manuel Tüketim Raporu Getirme
+        public async Task<ManualConsumptionSummary?> GetManualConsumptionReportAsync(ReportFilters filters)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/reports/manual-consumption", filters);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                // Veri bulunamadığında null döndürürüz.
+                return null;
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"API Hatası (Manuel Tüketim): {response.StatusCode}");
+                Console.WriteLine($"Hata Detayı: {errorContent}");
+                return null;
+            }
+
+            return await response.Content.ReadFromJsonAsync<ManualConsumptionSummary>();
+        }
+        public async Task<ConsumptionTotals?> GetConsumptionTotalsAsync(ReportFilters filters)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/reports/consumption-totals", filters);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"API Hatası (Genel Tüketim): {response.StatusCode}");
+                Console.WriteLine($"Hata Detayı: {errorContent}");
+                return null;
+            }
+
+            return await response.Content.ReadFromJsonAsync<ConsumptionTotals>();
+        }
+        // YENİ METOT: Genel Detaylı Tüketim Raporu Getirme
+        public async Task<List<ProductionReportItem>?> GetGeneralDetailedConsumptionReportAsync(GeneralDetailedConsumptionFilters filters)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/reports/general-detailed", filters);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"API Hatası (Genel Detaylı Tüketim): {response.StatusCode}");
+                Console.WriteLine($"Hata Detayı: {errorContent}");
+                return null;
+            }
+
+            return await response.Content.ReadFromJsonAsync<List<ProductionReportItem>>();
         }
     }
 }

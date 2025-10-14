@@ -97,5 +97,20 @@ namespace TekstilScada.WebAPI.Controllers
 
             return Ok(recipeFromPlc);
         }
+        // YENİ METOT: Reçete Kullanım Geçmişini ve Tüketimi Getirme
+        [HttpGet("{recipeId}/usage-history")]
+        public ActionResult<IEnumerable<ProductionReportItem>> GetRecipeUsageHistory(int recipeId)
+        {
+            try
+            {
+                // RecipeRepository'deki mevcut metot zaten consumption verilerini döndürür.
+                var history = _recipeRepository.GetRecipeUsageHistory(recipeId);
+                return Ok(history);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Reçete kullanım geçmişi alınırken bir hata oluştu: {ex.Message}");
+            }
+        }
     }
 }
