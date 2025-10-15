@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using System.Text.Json.Serialization;
+using TekstilScada.Core.Models;
 using TekstilScada.Models;
 using TekstilScada.Repositories;
 
@@ -13,6 +14,20 @@ public class GeneralDetailedConsumptionFilters
 
     // Çoklu seçim için List<int> MachineIds
     public List<int>? MachineIds { get; set; }
+}
+public class ActionLogFiltersDto
+{
+    [JsonPropertyName("startTime")]
+    public string? StartTime { get; set; }
+
+    [JsonPropertyName("endTime")]
+    public string? EndTime { get; set; }
+
+    [JsonPropertyName("username")]
+    public string? Username { get; set; }
+
+    [JsonPropertyName("details")]
+    public string? Details { get; set; }
 }
 public class ReportFiltersDto
 {
@@ -51,14 +66,17 @@ public class ReportsController : ControllerBase
     private readonly ProcessLogRepository _processLogRepository; // YENİ: ProcessLogRepository tanımlandı
     private readonly MachineRepository _machineRepository;
     private readonly DashboardRepository _dashboardRepository;
+    private readonly UserRepository _userRepository;
+
     // Constructor güncellenmeli
-    public ReportsController(ProductionRepository productionRepository, AlarmRepository alarmRepository, ProcessLogRepository processLogRepository,MachineRepository machineRepository,DashboardRepository dashboardRepository)
+    public ReportsController(ProductionRepository productionRepository, AlarmRepository alarmRepository, ProcessLogRepository processLogRepository,MachineRepository machineRepository,DashboardRepository dashboardRepository,UserRepository userRepository)
     {
         _productionRepository = productionRepository;
         _alarmRepository = alarmRepository;
         _processLogRepository = processLogRepository; // YENİ atama
         _machineRepository = machineRepository;
         _dashboardRepository = dashboardRepository;
+        _userRepository = userRepository;
     }
 
     [HttpPost("production")]
@@ -263,7 +281,7 @@ public class ReportsController : ControllerBase
 
                 // Sadece tüketim verisi olan tamamlanmış partileri rapora ekleriz
                 combinedResults.AddRange(machineReport.Where(item =>
-                    item.EndTime != DateTime.MinValue && (item.TotalWater > 0 || item.TotalElectricity > 0 || item.TotalSteam > 0)));
+                    item.EndTime != DateTime.MinValue));
             }
 
             return Ok(combinedResults);
@@ -272,6 +290,30 @@ public class ReportsController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, $"Genel detaylı tüketim raporu oluşturulurken bir hata oluştu: {ex.Message}");
+        }
+    }
+    [HttpPost("action-logs")]
+    public ActionResult<IEnumerable<ActionLogEntry>> GetActionLogs([FromBody] ActionLogFiltersDto filtersDto)
+    {
+        if (filtersDto.StartTime == null || filtersDto.EndTime == null)
+        {
+            return BadRequest("Başlangıç ve Bitiş tarihleri zorunludur.");
+        }
+
+        try
+        {
+            var startTime = DateTime.Parse(filtersDto.StartTime, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+            var endTime = DateTime.Parse(filtersDto.EndTime, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+
+            var coreStartTime = DateTime.SpecifyKind(startTime.Date, DateTimeKind.Unspecified);
+            var coreEndTime = DateTime.SpecifyKind(endTime.Date.AddDays(1).AddTicks(-1), DateTimeKind.Unspecified);
+
+            var reportData = _userRepository.GetActionLogs(coreStartTime, coreEndTime, filtersDto.Username?.Trim(), filtersDto.Details?.Trim());
+            return Ok(reportData);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Eylem Kayıtları raporu oluşturulurken bir hata oluştu: {ex.Message}");
         }
     }
 }

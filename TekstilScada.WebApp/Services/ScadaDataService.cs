@@ -11,6 +11,13 @@ public class GeneralDetailedConsumptionFilters
     public DateTime EndTime { get; set; }
     public List<int>? MachineIds { get; set; }
 }
+public class ActionLogFilters
+{
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public string? Username { get; set; }
+    public string? Details { get; set; }
+}
 namespace TekstilScada.WebApp.Services
 {
     public class ScadaDataService
@@ -262,5 +269,22 @@ namespace TekstilScada.WebApp.Services
 
             return await response.Content.ReadFromJsonAsync<List<ProductionReportItem>>();
         }
+        public async Task<List<TekstilScada.Core.Models.ActionLogEntry>?> GetActionLogsAsync(ActionLogFilters filters)
+        {
+            // TekstilScada.Core.Models.ActionLogEntry modelini kullanıyoruz.
+            var response = await _httpClient.PostAsJsonAsync("api/reports/action-logs", filters);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"API Hatası (Eylem Kayıtları): {response.StatusCode}");
+                Console.WriteLine($"Hata Detayı: {errorContent}");
+                return new List<TekstilScada.Core.Models.ActionLogEntry>();
+            }
+
+            return await response.Content.ReadFromJsonAsync<List<TekstilScada.Core.Models.ActionLogEntry>>();
+        }
+
+
     }
 }
